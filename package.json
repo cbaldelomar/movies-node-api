@@ -1,0 +1,40 @@
+{
+  "name": "movies-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "tsc": "tsc",
+    "start": "node build/app.js",
+    "dev": "ts-node-dev src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "2.8.5",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "mongodb": "6.2.0",
+    "mysql2": "3.6.3",
+    "sequelize": "6.35.0",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.16",
+    "@types/express": "4.17.21",
+    "ts-node-dev": "2.0.0",
+    "ts-standard": "12.0.2",
+    "typescript": "5.2.2"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "extends": [
+      "./node_modules/ts-standard/eslintrc.json"
+    ]
+  }
+}
