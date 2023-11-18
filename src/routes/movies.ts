@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import MovieController from '../controllers/movies'
-import { IMovieRepository } from '../types.js'
+import { IMovieRepository } from '../data/repositories/movie'
 
 const createMovieRouter = (repository: IMovieRepository): Router => {
   const moviesRouter = Router()

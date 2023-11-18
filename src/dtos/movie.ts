@@ -1,4 +1,4 @@
-import Movie from '../data/models/movie'
+import Movie from '../data/entities/movie'
 
 export class MovieDTO {
   readonly id: string
@@ -18,6 +18,6 @@ export class MovieDTO {
     this.duration = movie.duration
     this.poster = movie.poster
     this.rate = movie.rate
-    this.genres = movie.Genres.map((genre: any) => genre.name)
+    this.genres = movie.genres.map((genre) => genre.name)
   }
 }

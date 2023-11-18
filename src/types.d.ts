@@ -6,6 +6,24 @@ export interface Server {
   port?: number | undefined
 }
 
+// export interface Movie {
+//   id: Buffer
+//   uuid: string
+//   title: string
+//   year: number
+//   director: string
+//   duration: number
+//   poster?: string
+//   rate?: number
+//   createdAt: string
+//   genres: Genre[]
+// }
+
+// export interface Genre {
+//   id: number
+//   name: string
+// }
+
 export interface CreateMovieDTO {
   title: string
   year: number
@@ -26,13 +44,6 @@ export interface UpdateMovieDTO {
   genres?: string[]
 }
 
-export type editMovieEntry = Omit<CreateMovieDTO, 'id'>
-
-export interface movieFilter {
+export interface MovieFilter {
   genre?: string
-}
-
-export interface IMovieRepository {
-  getAll: (filter: movieFilter) => Promise<Movie[]>
-  getById: (id: string) => Promise<Movie | null>
 }

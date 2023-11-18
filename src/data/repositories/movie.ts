@@ -1,12 +1,16 @@
 import { Sequelize } from 'sequelize'
-import { IMovieRepository, movieFilter } from '../../types'
-import Genre from '../models/genre'
-// import Genre from '../models/genre'
-import Movie from '../models/movie'
-import MovieGenre from '../models/movieGenre'
+import { MovieFilter } from '../../types'
+import Genre from '../entities/genre'
+import MovieGenre from '../entities/movieGenre'
+import Movie from '../entities/movie'
+
+export interface IMovieRepository {
+  getAll: (filter: MovieFilter) => Promise<Movie[]>
+  getById: (id: string) => Promise<Movie | null>
+}
 
 const MovieRepository: IMovieRepository = {
-  getAll: async (filter: movieFilter): Promise<Movie[]> => {
+  getAll: async (filter: MovieFilter): Promise<Movie[]> => {
     const genre = filter.genre?.toLowerCase() ?? null
 
     if (genre == null) {
@@ -46,8 +50,13 @@ const MovieRepository: IMovieRepository = {
   getById: async (id: string): Promise<Movie | null> => {
     return await Movie.findOne({
       where: {
-        id: Sequelize.where(Sequelize.fn('UUID_TO_BIN', id, true), Sequelize.col('id'))
+        id: Sequelize.fn('UUID_TO_BIN', id, true)
       }
+      // where: {
+      //   id: {
+      //     [Op.eq]: Sequelize.where(Sequelize.fn('UUID_TO_BIN', id, true), Sequelize.col('id'))
+      //   }
+      // }
     })
   }
 }

@@ -1,6 +1,25 @@
-import { DataTypes, Model, Sequelize } from 'sequelize'
+import {
+  CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute,
+  Sequelize
+} from 'sequelize'
+import Genre from './genre'
 
-export default class Movie extends Model {
+export default class Movie extends Model<
+InferAttributes<Movie, { omit: 'genres' }>,
+InferCreationAttributes<Movie, { omit: 'genres' }>
+> {
+  declare id: CreationOptional<Buffer>
+  declare uuid: string
+  declare title: string
+  declare year: number
+  declare director: string
+  declare duration: number
+  declare poster?: string
+  declare rate?: number
+  declare createdAt: string
+
+  declare genres: NonAttribute<Genre[]>
+
   static config (sequelize: Sequelize): void {
     Movie.init({
       id: {

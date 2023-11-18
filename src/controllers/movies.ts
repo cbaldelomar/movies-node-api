@@ -1,7 +1,7 @@
 // import { validateMovie, validatePartialMovie } from '../schemas/movies'
 import { RequestHandler } from 'express'
-import { IMovieRepository } from '../types'
 import { validateMovieFilter } from '../schemas/movieFilter'
+import { IMovieRepository } from '../data/repositories/movie'
 
 export default class MovieController {
   private readonly repository: IMovieRepository
@@ -22,7 +22,7 @@ export default class MovieController {
     const movies = await this.repository.getAll(filter)
     // console.log(movies)
     const moviesVM = movies.map((movie) => {
-      const genres = movie.Genres.map((genre: any) => genre.name)
+      const genres = movie.genres.map((genre) => genre.name)
 
       return {
         id: movie.uuid,
