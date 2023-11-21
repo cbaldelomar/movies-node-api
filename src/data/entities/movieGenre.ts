@@ -1,5 +1,5 @@
 import { DataTypes, Model, Sequelize } from 'sequelize'
-import MovieEntity from './movie'
+import Movie from './movie'
 import Genre from './genre'
 
 export default class MovieGenre extends Model {
@@ -9,7 +9,7 @@ export default class MovieGenre extends Model {
         type: DataTypes.STRING(16, true),
         allowNull: false,
         references: {
-          model: MovieEntity,
+          model: Movie,
           key: 'id'
         }
       },
@@ -23,7 +23,6 @@ export default class MovieGenre extends Model {
       }
     }, {
       sequelize,
-      modelName: 'MovieGenre',
       timestamps: false
     })
   }

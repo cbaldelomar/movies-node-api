@@ -26,7 +26,6 @@ InferCreationAttributes<Genre>
       }
     }, {
       sequelize,
-      modelName: 'Genre',
       timestamps: false
     })
   }

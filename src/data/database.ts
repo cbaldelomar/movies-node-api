@@ -1,22 +1,23 @@
 import { Sequelize, Options } from 'sequelize'
-import MovieEntity from './entities/movie'
+import Movie from './entities/movie'
 import { Server } from '../types'
 import Genre from './entities/genre'
 import MovieGenre from './entities/movieGenre'
+import { AssociationAlias } from '../enums'
 
-const initModels = (sequelize: Sequelize): void => {
+const configModels = (sequelize: Sequelize): void => {
   // Include all models configurations here.
 
-  MovieEntity.config(sequelize)
+  Movie.config(sequelize)
   Genre.config(sequelize)
   MovieGenre.config(sequelize)
 
   // Using Super Many-to-Many relationship approach
   // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/#the-best-of-both-worlds-the-super-many-to-many-relationship
-  MovieEntity.belongsToMany(Genre, { through: MovieGenre, as: 'genres' })
-  Genre.belongsToMany(MovieEntity, { through: MovieGenre, as: 'movies' })
-  MovieEntity.hasMany(MovieGenre)
-  MovieGenre.belongsTo(MovieEntity)
+  Movie.belongsToMany(Genre, { through: MovieGenre, as: AssociationAlias.Genres })
+  Genre.belongsToMany(Movie, { through: MovieGenre, as: AssociationAlias.Movies })
+  Movie.hasMany(MovieGenre)
+  MovieGenre.belongsTo(Movie)
   Genre.hasMany(MovieGenre)
   MovieGenre.belongsTo(Genre)
 }
@@ -28,13 +29,14 @@ const configDatabase = (server: Server): void => {
     ...server,
     dialect: 'mysql',
     define: {
+      // Stop table name auto-pluralization. All tables will use the same name as the model name.
       freezeTableName: true
     }
   }
 
   const sequelize = new Sequelize(options)
   // await this.sequelize.authenticate()
-  initModels(sequelize)
+  configModels(sequelize)
 }
 
 export default configDatabase

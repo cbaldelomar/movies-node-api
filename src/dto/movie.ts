@@ -6,8 +6,8 @@ export class MovieDTO {
   readonly year: number
   readonly director: string
   readonly duration: number
-  readonly poster?: string
-  readonly rate?: number
+  readonly poster: string | null
+  readonly rate: number | null
   readonly genres: string[]
 
   constructor (movie: Movie) {
@@ -18,6 +18,6 @@ export class MovieDTO {
     this.duration = movie.duration
     this.poster = movie.poster
     this.rate = movie.rate
-    this.genres = movie.genres.map((genre) => genre.name)
+    this.genres = movie.genres?.map(genre => genre.name) ?? []
   }
 }

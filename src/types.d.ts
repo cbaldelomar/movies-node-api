@@ -24,26 +24,6 @@ export interface Server {
 //   name: string
 // }
 
-export interface CreateMovieDTO {
-  title: string
-  year: number
-  director: string
-  duration: number
-  poster?: string
-  rate?: number
-  genres: string[]
-}
-
-export interface UpdateMovieDTO {
-  title?: string
-  year?: number
-  director?: string
-  duration?: number
-  poster?: string
-  rate?: number
-  genres?: string[]
-}
-
 export interface MovieFilter {
   genre?: string
 }

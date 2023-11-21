@@ -1,5 +1,6 @@
 import z from 'zod'
-import { CreateMovieDTO, UpdateMovieDTO } from '../types'
+import { CreateMovieDTO } from '../dto/createMovie'
+import { UpdateMovieDTO } from '../dto/updateMovie'
 
 const currentYear = new Date().getFullYear()
 
@@ -13,7 +14,7 @@ const movieSchema = z.object({
   director: z.string(),
   duration: z.number().positive({ message: 'Duration must be greater than 0' }),
   poster: z.string().url({ message: 'Poster must be a valid URL' }).optional(),
-  genre: z.string().array().nonempty({
+  genres: z.string().array().nonempty({
     message: 'Genre must be a non-empty array of strings'
   }),
   rate: z.number().min(0).max(10).default(5)

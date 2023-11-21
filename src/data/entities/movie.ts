@@ -14,11 +14,11 @@ InferCreationAttributes<Movie, { omit: 'genres' }>
   declare year: number
   declare director: string
   declare duration: number
-  declare poster?: string
-  declare rate?: number
-  declare createdAt: string
+  declare poster: string | null
+  declare rate: number | null
+  declare createdAt: CreationOptional<Date>
 
-  declare genres: NonAttribute<Genre[]>
+  declare genres?: NonAttribute<Genre[]>
 
   static config (sequelize: Sequelize): void {
     Movie.init({
@@ -59,7 +59,7 @@ InferCreationAttributes<Movie, { omit: 'genres' }>
       }
     }, {
       sequelize,
-      modelName: 'Movie',
+      // modelName: 'Movie',
       timestamps: true,
       createdAt: true,
       updatedAt: false

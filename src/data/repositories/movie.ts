@@ -15,7 +15,11 @@ const MovieRepository: IMovieRepository = {
 
     if (genre == null) {
       return await Movie.findAll({
-        include: Genre
+        include: [Movie.associations.genres]
+        // include: {
+        //   model: Genre,
+        //   as: AssociationAlias.Genres
+        // }
       })
     }
 
@@ -29,21 +33,24 @@ const MovieRepository: IMovieRepository = {
           include: [
             {
               model: Genre,
-              where: {
-                name: genre
-              },
+              where: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), genre),
+              // where: {
+              //   name: genre
+              // },
               required: true
             }
           ]
         },
         // Using Many-to-Many association to include all genres of the filtered movies
-        {
-          model: Genre
-          // required: true,
-          // through: {
-          //   attributes: []
-          // }
-        }
+        Movie.associations.genres
+        // {
+        //   model: Genre,
+        //   as: AssociationAlias.Genres
+        //   // required: true,
+        //   // through: {
+        //   //   attributes: []
+        //   // }
+        // }
       ]
     })
   },
@@ -51,37 +58,20 @@ const MovieRepository: IMovieRepository = {
     return await Movie.findOne({
       where: {
         id: Sequelize.fn('UUID_TO_BIN', id, true)
-      }
-      // where: {
-      //   id: {
-      //     [Op.eq]: Sequelize.where(Sequelize.fn('UUID_TO_BIN', id, true), Sequelize.col('id'))
-      //   }
+      },
+      include: [Movie.associations.genres]
+      // include: {
+      //   model: Genre,
+      //   as: AssociationAlias.Genres
       // }
     })
   }
+  // Add: async (movie: Movie): Promise<boolean> => {
+  //   await Movie.create()
+  // }
 }
 
 export default MovieRepository
-
-// getById = async ({ id }) => {
-//   const db = await this.database.connect()
-
-//   const sql =
-//     `SELECT
-//     BIN_TO_UUID(id, true) AS Id,
-//     Title,
-//     Year,
-//     Director,
-//     Duration,
-//     Poster,
-//     Rate
-//   FROM Movie
-//   WHERE id = UUID_TO_BIN(?, true)`
-
-//   const [movie] = await db.query(sql, [id])
-
-//   return movie
-// }
 
 // create = async ({ movie }) => {
 //   const db = await this.database.connect()

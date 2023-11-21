@@ -2,6 +2,8 @@
 import { RequestHandler } from 'express'
 import { validateMovieFilter } from '../schemas/movieFilter'
 import { IMovieRepository } from '../data/repositories/movie'
+import { MovieDTO } from '../dto/movie'
+import { validate as validateUUID } from 'uuid'
 
 export default class MovieController {
   private readonly repository: IMovieRepository
@@ -21,21 +23,7 @@ export default class MovieController {
 
     const movies = await this.repository.getAll(filter)
     // console.log(movies)
-    const moviesVM = movies.map((movie) => {
-      const genres = movie.genres.map((genre) => genre.name)
-
-      return {
-        id: movie.uuid,
-        title: movie.title,
-        year: movie.year,
-        director: movie.director,
-        duration: movie.duration,
-        poster: movie.poster,
-        rate: movie.rate,
-        genres
-      }
-      // return new MovieDTO(movie)
-    })
+    const moviesVM = movies.map(movie => new MovieDTO(movie))
     // console.log(moviesVM)
     return res.json(moviesVM)
   }) as RequestHandler
@@ -43,13 +31,19 @@ export default class MovieController {
   getById = (async (req, res) => {
     const { id } = req.params
 
+    if (!validateUUID(id)) {
+      return res.status(400).json({ message: 'Invalid ID' })
+    }
+
     const movie = await this.repository.getById(id)
 
     if (movie == null) {
       return res.status(404).json({ message: 'Movie not found' })
     }
 
-    return res.json(movie)
+    const movieDTO = new MovieDTO(movie)
+
+    return res.json(movieDTO)
   }) as RequestHandler
 
   // create = async (req, res) => {
