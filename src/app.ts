@@ -2,8 +2,8 @@ import dotenv from 'dotenv'
 import express from 'express'
 import { corsMiddleware } from './middlewares/cors'
 import createMovieRouter from './routes/movies'
-import configDatabase from './data/database'
-import MovieRepository from './data/repositories/movie'
+import configDatabase from './data/config'
+import MovieService from './services/movie'
 
 dotenv.config()
 
@@ -28,9 +28,9 @@ const server = {
   password: process.env.DB_PASSWORD
 }
 
-configDatabase(server)
-
-const movieRouter = createMovieRouter(MovieRepository)
+const database = configDatabase(server)
+const movieService = new MovieService(database)
+const movieRouter = createMovieRouter(movieService)
 
 app.use('/movies', movieRouter)
 

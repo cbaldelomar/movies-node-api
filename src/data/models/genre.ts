@@ -5,10 +5,10 @@ import {
 import Movie from './movie'
 
 export default class Genre extends Model<
-InferAttributes<Genre>,
-InferCreationAttributes<Genre>
+InferAttributes<Genre, { omit: 'movies' }>,
+InferCreationAttributes<Genre, { omit: 'movies' }>
 > {
-  declare id: CreationOptional<number>
+  declare readonly id: CreationOptional<number>
   declare name: string
 
   declare movies: NonAttribute<Movie[]>

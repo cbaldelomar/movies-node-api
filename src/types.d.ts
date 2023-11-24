@@ -27,3 +27,9 @@ export interface Server {
 export interface MovieFilter {
   genre?: string
 }
+
+export type MovieId = Buffer
+
+export interface NewMovieId {
+  id: MovieId
+}

@@ -1,17 +1,17 @@
 import { Router } from 'express'
 import MovieController from '../controllers/movies'
-import { IMovieRepository } from '../data/repositories/movie'
+import MovieService from '../services/movie'
 
-const createMovieRouter = (repository: IMovieRepository): Router => {
+const createMovieRouter = (service: MovieService): Router => {
   const moviesRouter = Router()
 
-  const movieController = new MovieController(repository)
+  const movieController = new MovieController(service)
 
   moviesRouter.get('/', movieController.getAll)
 
   moviesRouter.get('/:id', movieController.getById)
 
-  // moviesRouter.post('/', service.create)
+  moviesRouter.post('/', movieController.create)
 
   // moviesRouter.patch('/:id', service.update)
 

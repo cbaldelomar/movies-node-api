@@ -1,15 +1,16 @@
 // import { validateMovie, validatePartialMovie } from '../schemas/movies'
 import { RequestHandler } from 'express'
 import { validateMovieFilter } from '../schemas/movieFilter'
-import { IMovieRepository } from '../data/repositories/movie'
+import MovieService from '../services/movie'
 import { MovieDTO } from '../dto/movie'
 import { validate as validateUUID } from 'uuid'
+import { validateCreateMovie } from '../schemas/movie'
 
 export default class MovieController {
-  private readonly repository: IMovieRepository
+  private readonly service: MovieService
 
-  constructor (repository: IMovieRepository) {
-    this.repository = repository
+  constructor (service: MovieService) {
+    this.service = service
   }
 
   getAll = (async (req, res) => {
@@ -21,11 +22,11 @@ export default class MovieController {
 
     const filter = validationResult.data
 
-    const movies = await this.repository.getAll(filter)
-    // console.log(movies)
-    const moviesVM = movies.map(movie => new MovieDTO(movie))
-    // console.log(moviesVM)
-    return res.json(moviesVM)
+    const movies = await this.service.getAll(filter)
+
+    const moviesDTO = movies.map(movie => new MovieDTO(movie))
+
+    return res.json(moviesDTO)
   }) as RequestHandler
 
   getById = (async (req, res) => {
@@ -35,7 +36,7 @@ export default class MovieController {
       return res.status(400).json({ message: 'Invalid ID' })
     }
 
-    const movie = await this.repository.getById(id)
+    const movie = await this.service.getById(id)
 
     if (movie == null) {
       return res.status(404).json({ message: 'Movie not found' })
@@ -46,18 +47,20 @@ export default class MovieController {
     return res.json(movieDTO)
   }) as RequestHandler
 
-  // create = async (req, res) => {
-  //   const validationResult = validateMovie(req.body)
+  create = (async (req, res) => {
+    const validationResult = await validateCreateMovie(req.body)
 
-  //   if (!validationResult.success) {
-  //   // return res.status(400).json({ error: JSON.parse(result.error.message) })
-  //     return res.status(400).json(validationResult.error.flatten())
-  //   }
+    if (!validationResult.success) {
+    // return res.status(400).json({ error: JSON.parse(result.error.message) })
+      return res.status(400).json(validationResult.error.flatten())
+    }
 
-  //   const newMovie = await this.movieModel.create({ movie: validationResult.data })
+    const movie = await this.service.create(validationResult.data)
 
-  //   res.status(201).json(newMovie)
-  // }
+    const movieDTO = new MovieDTO(movie)
+
+    return res.status(201).json(movieDTO)
+  }) as RequestHandler
 
   // update = async (req, res) => {
   //   const validationResult = validatePartialMovie(req.body)

@@ -1,8 +1,22 @@
 import z from 'zod'
 import { CreateMovieDTO } from '../dto/createMovie'
 import { UpdateMovieDTO } from '../dto/updateMovie'
+// import GenreService from '../services/genre'
 
 const currentYear = new Date().getFullYear()
+
+// Validate genres against database.
+// const isValidGenre = async (genres: string[]): Promise<boolean> => {
+//   const service = new GenreService()
+
+//   const data = await service.getAll()
+
+//   const validGenres = data.map(({ name }) => name)
+
+//   const invalidGenres = genres.filter(genre => !validGenres.includes(genre))
+
+//   return invalidGenres.length === 0
+// }
 
 const movieSchema = z.object({
   title: z.string({
@@ -15,15 +29,18 @@ const movieSchema = z.object({
   duration: z.number().positive({ message: 'Duration must be greater than 0' }),
   poster: z.string().url({ message: 'Poster must be a valid URL' }).optional(),
   genres: z.string().array().nonempty({
-    message: 'Genre must be a non-empty array of strings'
+    message: 'Genres must be a non-empty string array of genre names'
   }),
+  // genres: z.string().array().nonempty({
+  //   message: 'Genres must be a non-empty string array of genres names'
+  // }).refine(isValidGenre, { message: 'Invalid genre name' }),
   rate: z.number().min(0).max(10).default(5)
 })
 
-export function validateCreateMovie (object: any): z.SafeParseReturnType<any, CreateMovieDTO> {
-  return movieSchema.safeParse(object)
+export async function validateCreateMovie (object: any): Promise<z.SafeParseReturnType<any, CreateMovieDTO>> {
+  return await movieSchema.safeParseAsync(object)
 }
 
-export function validateUpdateMovie (object: any): z.SafeParseReturnType<any, UpdateMovieDTO> {
-  return movieSchema.partial().safeParse(object)
+export async function validateUpdateMovie (object: any): Promise<z.SafeParseReturnType<any, UpdateMovieDTO>> {
+  return await movieSchema.partial().safeParseAsync(object)
 }

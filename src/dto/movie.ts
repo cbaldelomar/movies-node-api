@@ -1,4 +1,4 @@
-import Movie from '../data/entities/movie'
+import Movie from '../data/models/movie'
 
 export class MovieDTO {
   readonly id: string

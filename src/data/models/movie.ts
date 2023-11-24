@@ -1,30 +1,39 @@
 import {
-  CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute,
+  CreationOptional, DataTypes, HasManySetAssociationsMixin, InferAttributes,
+  InferCreationAttributes, Model,
+  NonAttribute,
   Sequelize
 } from 'sequelize'
 import Genre from './genre'
+import { MovieId } from '../../types'
 
 export default class Movie extends Model<
 InferAttributes<Movie, { omit: 'genres' }>,
 InferCreationAttributes<Movie, { omit: 'genres' }>
 > {
-  declare id: CreationOptional<Buffer>
-  declare uuid: string
+  declare readonly id: CreationOptional<MovieId>
+  declare readonly uuid: CreationOptional<string>
   declare title: string
   declare year: number
   declare director: string
   declare duration: number
   declare poster: string | null
   declare rate: number | null
-  declare createdAt: CreationOptional<Date>
+  declare readonly createdAt: CreationOptional<Date>
 
   declare genres?: NonAttribute<Genre[]>
+
+  // 'Add' methods are used to associate with new instances, but don't touch any current associations
+  // declare addGenres: HasManyAddAssociationsMixin<Genre, number>
+  // 'Set' methods are used to associate with ONLY these instances, all other associations will be deleted.
+  declare setGenres: HasManySetAssociationsMixin<Genre, number>
 
   static config (sequelize: Sequelize): void {
     Movie.init({
       id: {
         type: DataTypes.STRING(16, true),
         primaryKey: true
+        // defaultValue: sequelize.literal('DEFAULT')
       },
       uuid: {
         type: DataTypes.UUID,

@@ -1,8 +1,8 @@
 import { Sequelize, Options } from 'sequelize'
-import Movie from './entities/movie'
+import Movie from './models/movie'
 import { Server } from '../types'
-import Genre from './entities/genre'
-import MovieGenre from './entities/movieGenre'
+import Genre from './models/genre'
+import MovieGenre from './models/movieGenre'
 import { AssociationAlias } from '../enums'
 
 const configModels = (sequelize: Sequelize): void => {
@@ -12,17 +12,18 @@ const configModels = (sequelize: Sequelize): void => {
   Genre.config(sequelize)
   MovieGenre.config(sequelize)
 
-  // Using Super Many-to-Many relationship approach
-  // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/#the-best-of-both-worlds-the-super-many-to-many-relationship
   Movie.belongsToMany(Genre, { through: MovieGenre, as: AssociationAlias.Genres })
   Genre.belongsToMany(Movie, { through: MovieGenre, as: AssociationAlias.Movies })
-  Movie.hasMany(MovieGenre)
-  MovieGenre.belongsTo(Movie)
-  Genre.hasMany(MovieGenre)
-  MovieGenre.belongsTo(Genre)
+
+  // Using Super Many-to-Many relationship approach
+  // https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/#the-best-of-both-worlds-the-super-many-to-many-relationship
+  // Movie.hasMany(MovieGenre)
+  // MovieGenre.belongsTo(Movie)
+  // Genre.hasMany(MovieGenre)
+  // MovieGenre.belongsTo(Genre)
 }
 
-const configDatabase = (server: Server): void => {
+const configDatabase = (server: Server): Sequelize => {
   server.port = server.port ?? 3306
 
   const options: Options = {
@@ -36,7 +37,10 @@ const configDatabase = (server: Server): void => {
 
   const sequelize = new Sequelize(options)
   // await this.sequelize.authenticate()
+
   configModels(sequelize)
+
+  return sequelize
 }
 
 export default configDatabase
