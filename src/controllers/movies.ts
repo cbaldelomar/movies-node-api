@@ -71,6 +71,10 @@ export default class MovieController {
 
     const { id } = req.params
 
+    if (!validateUUID(id)) {
+      return res.status(400).json({ message: 'Invalid ID' })
+    }
+
     const updatedMovie = await this.service.update(id, validationResult.data)
 
     if (updatedMovie == null) return res.status(404).json({ message: 'Movie not found' })
