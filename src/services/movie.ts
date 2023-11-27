@@ -201,15 +201,12 @@ export default class MovieService {
       movieGenres = await MovieService.checkValidGenres(genres)
     }
 
-    // Update movie properties.
-    updatedMovie.set(movie)
-
     // https://sequelize.org/docs/v6/other-topics/transactions/
     const transaction = await this.database.transaction()
 
     try {
-      // Save movie.
-      await updatedMovie.save({ transaction })
+      // Update movie.
+      await updatedMovie.update(movie, { transaction })
 
       // Update movie genres.
       if (movieGenres.length > 0) {
