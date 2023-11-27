@@ -15,7 +15,7 @@ const createMovieRouter = (service: MovieService): Router => {
 
   moviesRouter.patch('/:id', movieController.update)
 
-  // moviesRouter.delete('/:id', service.delete)
+  moviesRouter.delete('/:id', movieController.delete)
 
   return moviesRouter
 }

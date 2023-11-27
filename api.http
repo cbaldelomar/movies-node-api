@@ -5,14 +5,14 @@ GET http://localhost:3000/movies
 GET http://localhost:3000/movies?genre=fantasy
 
 ### Get movie by id
-GET http://localhost:3000/movies/c34bfa93-8b10-11ee-ac2e-509a4c43f702
+GET http://localhost:3000/movies/6c620146-8d6e-11ee-b8cf-509a4c43f702
 
 ### Crate movie
 POST http://localhost:3000/movies
 Content-Type: application/json
 
 {
-  "title": "Sound of Freedom",
+  "title": "Sound of Freedoms",
   "year": 2023,
   "director": "Alejandro Monteverde",
   "duration": 131,
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ### Update movie
-PATCH http://localhost:3000/movies/c34bfa93-8b10-11ee-ac2e-509a4c43f702
+PATCH http://localhost:3000/movies/b53d9cbe-8d6e-11ee-b8cf-509a4c43f702
 Content-Type: application/json
 
 {
@@ -30,4 +30,4 @@ Content-Type: application/json
 }
 
 ### Delete movie
-DELETE http://localhost:3000/movies/e7859c23-6c72-11ee-8bef-509a4c43f702
+DELETE http://localhost:3000/movies/b53d9cbe-8d6e-11ee-b8cf-509a4c43f702

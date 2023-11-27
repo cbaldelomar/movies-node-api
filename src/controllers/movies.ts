@@ -63,16 +63,16 @@ export default class MovieController {
   }) as RequestHandler
 
   update = (async (req, res) => {
-    const validationResult = await validateUpdateMovie(req.body)
-
-    if (!validationResult.success) {
-      return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
-    }
-
     const { id } = req.params
 
     if (!validateUUID(id)) {
       return res.status(400).json({ message: 'Invalid ID' })
+    }
+
+    const validationResult = await validateUpdateMovie(req.body)
+
+    if (!validationResult.success) {
+      return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
     }
 
     const updatedMovie = await this.service.update(id, validationResult.data)
@@ -84,13 +84,17 @@ export default class MovieController {
     return res.json(movieDTO)
   }) as RequestHandler
 
-  // delete = async (req, res) => {
-  //   const { id } = req.params
+  delete = (async (req, res) => {
+    const { id } = req.params
 
-  //   const result = await this.movieModel.delete({ id })
+    if (!validateUUID(id)) {
+      return res.status(400).json({ message: 'Invalid ID' })
+    }
 
-  //   if (result === false) return res.status(404).json({ message: 'Movie not found' })
+    const result = await this.service.delete(id)
 
-  //   res.json({ message: 'Movie deleted' })
-  // }
+    if (result === false) return res.status(404).json({ message: 'Movie not found' })
+
+    return res.json({ message: 'Movie deleted' })
+  }) as RequestHandler
 }

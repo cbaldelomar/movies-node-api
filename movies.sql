@@ -35,7 +35,7 @@ CREATE TABLE MovieGenre(
 	MovieId BINARY(16) NOT NULL,
     GenreId INT NOT NULL,
     PRIMARY KEY (MovieId, GenreId),
-    CONSTRAINT FK_MovieGenre_Movie_MovieId FOREIGN KEY (MovieId) REFERENCES Movie(Id),
+    CONSTRAINT FK_MovieGenre_Movie_MovieId FOREIGN KEY (MovieId) REFERENCES Movie(Id) ON DELETE CASCADE,
     CONSTRAINT FK_MovieGenre_Genre_GenreId FOREIGN KEY (GenreId) REFERENCES Genre(Id),
     INDEX IX_FK_MovieGenre_Movie_MovieId (MovieId),
     INDEX IX_FK_MovieGenre_Genre_GenreId (GenreId)

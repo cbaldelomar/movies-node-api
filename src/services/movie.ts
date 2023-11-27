@@ -145,9 +145,10 @@ export default class MovieService {
 
       await transaction.commit()
 
+      await newMovie.reload()
+
       // Set the genres property.
       newMovie.genres = movieGenres
-
       return newMovie
     } catch (error) {
       console.log(error)
@@ -220,30 +221,34 @@ export default class MovieService {
 
       return updatedMovie
     } catch (error) {
-      console.error(error)
+      console.log(error)
+
+      await transaction.rollback()
+
       throw new Error('Error updating movie.')
     }
   }
+
+  delete = async (id: string): Promise<boolean> => {
+    // Get movie from database.
+    const movie = await this.getById(id)
+
+    if (movie == null) return false
+
+    const transaction = await this.database.transaction()
+
+    try {
+      await movie.destroy({ transaction })
+
+      await transaction.commit()
+
+      return true
+    } catch (error) {
+      console.error(error)
+
+      await transaction.rollback()
+
+      throw new Error('Error deleting movie.')
+    }
+  }
 }
-
-// delete = async ({ id }) => {
-//   const db = await this.database.connect()
-
-//   try {
-//     await db.beginTransaction()
-
-//     let sql = 'DELETE FROM MovieGenre WHERE MovieId = UUID_TO_BIN(?, true)'
-//     await db.execute(sql, [id])
-
-//     sql = 'DELETE FROM Movie WHERE Id = UUID_TO_BIN(?, true)'
-//     const [{ affectedRows }] = await db.execute(sql, [id])
-
-//     await db.commit()
-
-//     return affectedRows > 0
-//   } catch (error) {
-//     await db.rollback()
-//     console.error(error)
-//     throw new Error('Error deleting movie.')
-//   }
-// }
