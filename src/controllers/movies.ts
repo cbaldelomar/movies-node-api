@@ -4,7 +4,7 @@ import { validateMovieFilter } from '../schemas/movieFilter'
 import MovieService from '../services/movie'
 import { MovieDTO } from '../dto/movie'
 import { validate as validateUUID } from 'uuid'
-import { validateCreateMovie } from '../schemas/movie'
+import { validateCreateMovie, validateUpdateMovie } from '../schemas/movie'
 
 export default class MovieController {
   private readonly service: MovieService
@@ -62,21 +62,23 @@ export default class MovieController {
     return res.status(201).json(movieDTO)
   }) as RequestHandler
 
-  // update = async (req, res) => {
-  //   const validationResult = validatePartialMovie(req.body)
+  update = (async (req, res) => {
+    const validationResult = await validateUpdateMovie(req.body)
 
-  //   if (!validationResult.success) {
-  //     return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
-  //   }
+    if (!validationResult.success) {
+      return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
+    }
 
-  //   const { id } = req.params
+    const { id } = req.params
 
-  //   const updatedMovie = await this.movieModel.update({ id, movie: validationResult.data })
+    const updatedMovie = await this.service.update(id, validationResult.data)
 
-  //   if (updatedMovie === false) return res.status(404).json({ message: 'Movie not found' })
+    if (updatedMovie == null) return res.status(404).json({ message: 'Movie not found' })
 
-  //   res.json(updatedMovie)
-  // }
+    const movieDTO = new MovieDTO(updatedMovie)
+
+    return res.json(movieDTO)
+  }) as RequestHandler
 
   // delete = async (req, res) => {
   //   const { id } = req.params

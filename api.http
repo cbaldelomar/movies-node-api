@@ -1,11 +1,11 @@
 ### Get movies
 GET http://localhost:3000/movies
 
-### Get movie by id
-GET http://localhost:3000/movies/a22ec36a-84bb-11ee-b43c-509a4c43f702
-
 ### Get movies by genre
 GET http://localhost:3000/movies?genre=fantasy
+
+### Get movie by id
+GET http://localhost:3000/movies/c34bfa93-8b10-11ee-ac2e-509a4c43f702
 
 ### Crate movie
 POST http://localhost:3000/movies
@@ -21,10 +21,11 @@ Content-Type: application/json
 }
 
 ### Update movie
-PATCH http://localhost:3000/movies/57c38c3a-67bd-11ee-b095-509a4c43f702
+PATCH http://localhost:3000/movies/c34bfa93-8b10-11ee-ac2e-509a4c43f702
 Content-Type: application/json
 
 {
+  "title": "Sound of Freedom",
   "year": 1994
 }
 

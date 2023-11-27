@@ -13,7 +13,7 @@ const createMovieRouter = (service: MovieService): Router => {
 
   moviesRouter.post('/', movieController.create)
 
-  // moviesRouter.patch('/:id', service.update)
+  moviesRouter.patch('/:id', movieController.update)
 
   // moviesRouter.delete('/:id', service.delete)
 

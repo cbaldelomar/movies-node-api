@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "start": "node build/app.js",
     "dev": "ts-node-dev src/app.ts",
-    "dev-test": "ts-node-dev src/test.ts",
+    "dev-test": "ts-node-dev test.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
