@@ -1,6 +1,6 @@
 import { Sequelize, Options } from 'sequelize'
 import Movie from './models/movie'
-import { Server } from '../types'
+import { IServer } from '../types'
 import Genre from './models/genre'
 import MovieGenre from './models/movieGenre'
 import { AssociationAlias } from '../enums'
@@ -23,7 +23,7 @@ const configModels = (sequelize: Sequelize): void => {
   // MovieGenre.belongsTo(Genre)
 }
 
-const configDatabase = (server: Server): Sequelize => {
+const configDatabase = (server: IServer): Sequelize => {
   server.port = server.port ?? 3306
 
   const options: Options = {

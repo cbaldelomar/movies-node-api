@@ -1,26 +1,22 @@
 import { Op, QueryTypes, Sequelize } from 'sequelize'
-import { MovieFilter, NewMovieId } from '../types'
+import {
+  IMovieService, IMovieFilter, INewMovieId,
+  ICreateMovieRequest, IUpdateMovieRequest, ResultType
+} from '../types'
 import Genre from '../data/models/genre'
-// import MovieGenre from '../data/models/movieGenre'
 import Movie from '../data/models/movie'
-import { AssociationAlias, SqlFunctions } from '../enums'
-import { CreateMovieDTO } from '../dto/createMovie'
-import { UpdateMovieDTO } from '../dto/updateMovie'
+import { AssociationAlias, ErrorMessages, ErrorTypes, SqlFunctions } from '../enums'
+import { ResultError, ResultSuccess, ResultValidationError, ValidationError } from '../utils/result'
+import { validate as isUUID } from 'uuid'
 
-// export interface MovieService {
-//   getAll: (filter: MovieFilter) => Promise<Movie[]>
-//   getById: (id: string) => Promise<Movie | null>
-//   create: (movieDTO: CreateMovieDTO) => Promise<Movie | null>
-// }
-
-export default class MovieService {
+export default class MovieService implements IMovieService {
   private readonly database: Sequelize
 
   constructor (database: Sequelize) {
     this.database = database
   }
 
-  getAll = async (filter: MovieFilter): Promise<Movie[]> => {
+  getAll = async (filter: IMovieFilter): Promise<Movie[]> => {
     const genre = filter.genre?.toLowerCase() ?? null
 
     if (genre == null) {
@@ -85,8 +81,12 @@ export default class MovieService {
     // })
   }
 
-  getById = async (id: string): Promise<Movie | null> => {
-    return await Movie.findOne({
+  getById = async (id: string): Promise<ResultType<Movie>> => {
+    if (!isUUID(id)) {
+      return ResultError.create(ErrorMessages.MOVIE_NOT_EXISTS, ErrorTypes.NOT_FOUND)
+    }
+
+    const movie = await Movie.findOne({
       where: {
         id: this.database.fn(SqlFunctions.UUID_TO_BIN, id, true)
       },
@@ -96,9 +96,15 @@ export default class MovieService {
       //   as: AssociationAlias.Genres
       // }
     })
+
+    if (movie == null) {
+      return ResultError.create(ErrorMessages.MOVIE_NOT_EXISTS, ErrorTypes.NOT_FOUND)
+    }
+
+    return ResultSuccess.create(movie)
   }
 
-  create = async (movie: CreateMovieDTO): Promise<Movie> => {
+  create = async (movie: ICreateMovieRequest): Promise<ResultType<Movie>> => {
     const { title, year, director, duration, poster, rate, genres } = movie
 
     // Check if movie exists.
@@ -111,11 +117,18 @@ export default class MovieService {
     })
 
     if (count > 0) {
-      throw new Error('Movie already exist.')
+      const error = ValidationError.create('', ErrorMessages.MOVIE_EXISTS)
+      return ResultValidationError.create(error)
     }
 
     // Check if genres exist.
-    const movieGenres = await MovieService.checkValidGenres(genres)
+    const result = await MovieService.checkValidGenres(genres)
+
+    if (!result.success) {
+      return result
+    }
+
+    const movieGenres = result.data
 
     // Get new id from database.
     const { id } = (await this.database.query(
@@ -124,7 +137,7 @@ export default class MovieService {
         type: QueryTypes.SELECT,
         raw: true,
         plain: true
-      })) as NewMovieId
+      })) as INewMovieId
 
     // https://sequelize.org/docs/v6/other-topics/transactions/
     const transaction = await this.database.transaction()
@@ -149,17 +162,16 @@ export default class MovieService {
 
       // Set the genres property.
       newMovie.genres = movieGenres
-      return newMovie
-    } catch (error) {
-      console.log(error)
 
+      return ResultSuccess.create(newMovie)
+    } catch (error) {
       await transaction.rollback()
 
-      throw new Error('Error registering movie.')
+      throw error
     }
   }
 
-  private static readonly checkValidGenres = async (genres: string[]): Promise<Genre[]> => {
+  private static readonly checkValidGenres = async (genres: string[]): Promise<ResultType<Genre[]>> => {
     // Check if genres exist.
     const uniqueGenres = [...new Set(genres)]
 
@@ -173,33 +185,44 @@ export default class MovieService {
 
     if (movieGenres.length === uniqueGenres.length) {
       // Return valid genres.
-      return movieGenres
+      return ResultSuccess.create(movieGenres)
     }
 
     // Identify invalid genres.
     const validGenreNames = movieGenres.map(({ name }) => name)
     const invalidGenreNames = genres.filter(genre => !validGenreNames.includes(genre))
-    let s: string = ''
+    const errors: ValidationError[] = []
 
-    if (invalidGenreNames.length > 1) {
-      s = 's'
-    }
+    invalidGenreNames.forEach(invalidGenre => {
+      const error = ValidationError.create('genres', ErrorMessages.INVALID_MOVIE_GENRE + ': ' + invalidGenre)
+      errors.push(error)
+    })
 
-    throw new Error(`Invalid genre name${s}: ` + invalidGenreNames.join(', '))
+    // const error = ValidationError.create('genres', ErrorMessages.INVALID_MOVIE_GENRE + ': ' + invalidGenreNames.join(', '))
+
+    return ResultValidationError.create(errors)
   }
 
-  update = async (id: string, movie: UpdateMovieDTO): Promise<Movie | null> => {
+  update = async (id: string, movie: IUpdateMovieRequest): Promise<ResultType<Movie>> => {
     const { genres } = movie
     let movieGenres: Genre[] = []
 
     // Get movie from database.
-    const updatedMovie = await this.getById(id)
+    const result = await this.getById(id)
 
-    if (updatedMovie == null) return null
+    if (!result.success) return result
+
+    const updatedMovie = result.data
 
     // Check valid genres.
     if (genres != null) {
-      movieGenres = await MovieService.checkValidGenres(genres)
+      const checkResult = await MovieService.checkValidGenres(genres)
+
+      if (!checkResult.success) {
+        return checkResult
+      }
+
+      movieGenres = checkResult.data
     }
 
     // https://sequelize.org/docs/v6/other-topics/transactions/
@@ -219,21 +242,21 @@ export default class MovieService {
 
       await transaction.commit()
 
-      return updatedMovie
+      return ResultSuccess.create(updatedMovie)
     } catch (error) {
-      console.log(error)
-
       await transaction.rollback()
 
-      throw new Error('Error updating movie.')
+      throw error
     }
   }
 
-  delete = async (id: string): Promise<boolean> => {
+  delete = async (id: string): Promise<ResultType<Movie>> => {
     // Get movie from database.
-    const movie = await this.getById(id)
+    const result = await this.getById(id)
 
-    if (movie == null) return false
+    if (!result.success) return result
+
+    const movie = result.data
 
     const transaction = await this.database.transaction()
 
@@ -242,13 +265,11 @@ export default class MovieService {
 
       await transaction.commit()
 
-      return true
+      return ResultSuccess.create(movie)
     } catch (error) {
-      console.error(error)
-
       await transaction.rollback()
 
-      throw new Error('Error deleting movie.')
+      throw error
     }
   }
 }

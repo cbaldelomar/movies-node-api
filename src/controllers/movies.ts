@@ -1,15 +1,14 @@
-// import { validateMovie, validatePartialMovie } from '../schemas/movies'
 import { RequestHandler } from 'express'
 import { validateMovieFilter } from '../schemas/movieFilter'
-import MovieService from '../services/movie'
-import { MovieDTO } from '../dto/movie'
-import { validate as validateUUID } from 'uuid'
+import { MovieResponse } from '../responses/movie'
 import { validateCreateMovie, validateUpdateMovie } from '../schemas/movie'
+import { IMovieService } from '../types'
+import { ErrorResponse } from '../responses/error'
 
 export default class MovieController {
-  private readonly service: MovieService
+  private readonly service: IMovieService
 
-  constructor (service: MovieService) {
+  constructor (service: IMovieService) {
     this.service = service
   }
 
@@ -24,27 +23,25 @@ export default class MovieController {
 
     const movies = await this.service.getAll(filter)
 
-    const moviesDTO = movies.map(movie => new MovieDTO(movie))
+    const movieResponses = movies.map(movie => new MovieResponse(movie))
 
-    return res.json(moviesDTO)
+    return res.json(movieResponses)
   }) as RequestHandler
 
   getById = (async (req, res) => {
     const { id } = req.params
 
-    if (!validateUUID(id)) {
-      return res.status(400).json({ message: 'Invalid ID' })
+    const result = await this.service.getById(id)
+
+    if (!result.success) {
+      const errorResponse = ErrorResponse.create(result)
+
+      return res.status(errorResponse.status).json(errorResponse.body)
     }
 
-    const movie = await this.service.getById(id)
+    const movieResponse = new MovieResponse(result.data)
 
-    if (movie == null) {
-      return res.status(404).json({ message: 'Movie not found' })
-    }
-
-    const movieDTO = new MovieDTO(movie)
-
-    return res.json(movieDTO)
+    return res.json(movieResponse)
   }) as RequestHandler
 
   create = (async (req, res) => {
@@ -55,46 +52,53 @@ export default class MovieController {
       return res.status(400).json(validationResult.error.flatten())
     }
 
-    const movie = await this.service.create(validationResult.data)
+    const result = await this.service.create(validationResult.data)
 
-    const movieDTO = new MovieDTO(movie)
+    if (!result.success) {
+      const errorResponse = ErrorResponse.create(result)
 
-    return res.status(201).json(movieDTO)
+      return res.status(errorResponse.status).json(errorResponse.body)
+    }
+
+    const movieResponse = new MovieResponse(result.data)
+
+    return res.status(201).json(movieResponse)
   }) as RequestHandler
 
   update = (async (req, res) => {
     const { id } = req.params
 
-    if (!validateUUID(id)) {
-      return res.status(400).json({ message: 'Invalid ID' })
-    }
-
     const validationResult = await validateUpdateMovie(req.body)
 
     if (!validationResult.success) {
-      return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
+      return res.status(400).json(validationResult.error.flatten())
+      // return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
     }
 
-    const updatedMovie = await this.service.update(id, validationResult.data)
+    const result = await this.service.update(id, validationResult.data)
 
-    if (updatedMovie == null) return res.status(404).json({ message: 'Movie not found' })
+    if (!result.success) {
+      const errorResponse = ErrorResponse.create(result)
 
-    const movieDTO = new MovieDTO(updatedMovie)
+      return res.status(errorResponse.status).json(errorResponse.body)
+    }
 
-    return res.json(movieDTO)
+    const movieResponse = new MovieResponse(result.data)
+
+    return res.json(movieResponse)
   }) as RequestHandler
 
   delete = (async (req, res) => {
     const { id } = req.params
 
-    if (!validateUUID(id)) {
-      return res.status(400).json({ message: 'Invalid ID' })
-    }
-
     const result = await this.service.delete(id)
 
-    if (result === false) return res.status(404).json({ message: 'Movie not found' })
+    if (!result.success) {
+      const errorResponse = ErrorResponse.create(result)
 
-    return res.json({ message: 'Movie deleted' })
+      return res.status(errorResponse.status).json(errorResponse.body)
+    }
+
+    return res.status(204).json()
   }) as RequestHandler
 }

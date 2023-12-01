@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import MovieController from '../controllers/movies'
-import MovieService from '../services/movie'
+import { IMovieService } from '../types'
 
-const createMovieRouter = (service: MovieService): Router => {
+const createMovieRouter = (service: IMovieService): Router => {
   const moviesRouter = Router()
 
   const movieController = new MovieController(service)

@@ -1,6 +1,5 @@
 import z from 'zod'
-import { CreateMovieDTO } from '../dto/createMovie'
-import { UpdateMovieDTO } from '../dto/updateMovie'
+import { ICreateMovieRequest, IUpdateMovieRequest } from '../types'
 // import GenreService from '../services/genre'
 
 const currentYear = new Date().getFullYear()
@@ -37,10 +36,10 @@ const movieSchema = z.object({
   rate: z.number().min(0).max(10).default(5)
 })
 
-export async function validateCreateMovie (object: any): Promise<z.SafeParseReturnType<any, CreateMovieDTO>> {
+export async function validateCreateMovie (object: any): Promise<z.SafeParseReturnType<any, ICreateMovieRequest>> {
   return await movieSchema.safeParseAsync(object)
 }
 
-export async function validateUpdateMovie (object: any): Promise<z.SafeParseReturnType<any, UpdateMovieDTO>> {
+export async function validateUpdateMovie (object: any): Promise<z.SafeParseReturnType<any, IUpdateMovieRequest>> {
   return await movieSchema.partial().safeParseAsync(object)
 }

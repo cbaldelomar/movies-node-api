@@ -1,6 +1,6 @@
 import Movie from '../data/models/movie'
 
-export class MovieDTO {
+export class MovieResponse {
   readonly id: string
   readonly title: string
   readonly year: number
