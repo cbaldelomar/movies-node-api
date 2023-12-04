@@ -1,54 +1,67 @@
+import { ZodError } from 'zod'
 import { ErrorTypes } from '../enums'
-import { IErrorResponse, IResultFailure, IValidationErrorResponse } from '../types'
+import {
+  IErrorResponse, IResultFailure,
+  IValidationError, IValidationErrorResponse
+} from '../types'
 
 export class ErrorResponse {
   readonly status: number
-  readonly body: IErrorResponse | IValidationErrorResponse<any>
-  readonly error: IResultFailure
+  readonly body: IErrorResponse | IValidationErrorResponse
+  readonly error: ErrorType
 
-  private constructor (status: number, error: IResultFailure) {
-    this.status = status
+  constructor (error: ErrorType) {
     this.error = error
     this.body = this.getBody()
+    this.status = this.getStatus()
   }
 
-  private readonly getBody = (): IErrorResponse | IValidationErrorResponse<any> => {
-    if (this.error.errorType !== ErrorTypes.VALIDATION) {
-      return { error: this.error.message }
+  private readonly isZodError = (): boolean => this.error instanceof ZodError
+
+  private readonly getStatus = (): number => {
+    if (this.isZodError()) return 400
+
+    return (this.error as IResultFailure).errorType
+  }
+
+  private readonly getBody = (): IErrorResponse | IValidationErrorResponse => {
+    let validationErrors: IValidationError[] = []
+
+    if (this.isZodError()) {
+      const error = this.error as ZodError
+
+      validationErrors = error.issues.map(issue => {
+        const field = issue.path.join('.')
+        return { field, message: issue.message }
+      })
+    } else {
+      const error = this.error as IResultFailure
+      if (error.errorType !== ErrorTypes.VALIDATION) {
+        return { error: error.message }
+      }
+
+      validationErrors = error.errors
     }
 
     const errors: string[] = []
     const fields: any = {}
 
-    this.error.errors.forEach(error => {
+    validationErrors.forEach(error => {
       if (error.field.length === 0) {
         errors.push(error.message)
       } else {
-        const arr = fields[error.field]
-        fields[error.field] = Array.isArray(arr) ? arr : []
-        fields[error.field].push(error.message)
+        const field = error.field
+        const arr = fields[field]
+        fields[field] = Array.isArray(arr) ? arr : []
+        fields[field].push(error.message)
       }
     })
 
     return { errors, fields }
   }
-
-  static create = (error: IResultFailure): ErrorResponse => {
-    let status: number = 400
-    switch (error.errorType) {
-      case ErrorTypes.NOT_FOUND:
-        status = 404
-        break
-      case ErrorTypes.AUTHORIZATION:
-        status = 403
-        break
-      default:
-        break
-    }
-
-    return new ErrorResponse(status, error)
-  }
 }
+
+type ErrorType = IResultFailure | ZodError
 
 // export function errorResponse<T> (error: IResultFailure): IErrorResponse | IValidationErrorResponse<T> {
 //   if (error.errorType !== ErrorTypes.VALIDATION) {

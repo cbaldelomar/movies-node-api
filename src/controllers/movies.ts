@@ -16,7 +16,11 @@ export default class MovieController {
     const validationResult = validateMovieFilter(req.query)
 
     if (!validationResult.success) {
-      return res.status(400).json(validationResult.error.flatten())
+      const errorResponse = new ErrorResponse(validationResult.error)
+
+      return res.status(errorResponse.status).json(errorResponse.body)
+
+      // return res.status(400).json(validationResult.error.flatten())
     }
 
     const filter = validationResult.data
@@ -34,7 +38,7 @@ export default class MovieController {
     const result = await this.service.getById(id)
 
     if (!result.success) {
-      const errorResponse = ErrorResponse.create(result)
+      const errorResponse = new ErrorResponse(result)
 
       return res.status(errorResponse.status).json(errorResponse.body)
     }
@@ -48,14 +52,18 @@ export default class MovieController {
     const validationResult = await validateCreateMovie(req.body)
 
     if (!validationResult.success) {
-    // return res.status(400).json({ error: JSON.parse(result.error.message) })
-      return res.status(400).json(validationResult.error.flatten())
+      const errorResponse = new ErrorResponse(validationResult.error)
+
+      return res.status(errorResponse.status).json(errorResponse.body)
+
+      // return res.status(400).json(validationResult.error.flatten())
+      // return res.status(400).json({ error: JSON.parse(result.error.message) })
     }
 
     const result = await this.service.create(validationResult.data)
 
     if (!result.success) {
-      const errorResponse = ErrorResponse.create(result)
+      const errorResponse = new ErrorResponse(result)
 
       return res.status(errorResponse.status).json(errorResponse.body)
     }
@@ -71,14 +79,18 @@ export default class MovieController {
     const validationResult = await validateUpdateMovie(req.body)
 
     if (!validationResult.success) {
-      return res.status(400).json(validationResult.error.flatten())
+      const errorResponse = new ErrorResponse(validationResult.error)
+
+      return res.status(errorResponse.status).json(errorResponse.body)
+
+      // return res.status(400).json(validationResult.error.flatten())
       // return res.status(400).json({ error: JSON.parse(validationResult.error.message) })
     }
 
     const result = await this.service.update(id, validationResult.data)
 
     if (!result.success) {
-      const errorResponse = ErrorResponse.create(result)
+      const errorResponse = new ErrorResponse(result)
 
       return res.status(errorResponse.status).json(errorResponse.body)
     }
@@ -94,7 +106,7 @@ export default class MovieController {
     const result = await this.service.delete(id)
 
     if (!result.success) {
-      const errorResponse = ErrorResponse.create(result)
+      const errorResponse = new ErrorResponse(result)
 
       return res.status(errorResponse.status).json(errorResponse.body)
     }

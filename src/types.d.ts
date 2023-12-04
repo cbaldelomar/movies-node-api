@@ -98,7 +98,7 @@ export interface IErrorResponse {
   error: string
 }
 
-export interface IValidationErrorResponse<T> {
+export interface IValidationErrorResponse<T = any> {
   errors: string[]
   fields: {
     [K in keyof T]?: string[]

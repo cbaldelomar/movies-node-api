@@ -19,7 +19,7 @@ export enum ErrorMessages {
 }
 
 export enum ErrorTypes {
-  NOT_FOUND,
-  AUTHORIZATION,
-  VALIDATION
+  NOT_FOUND = 404,
+  AUTHORIZATION = 403,
+  VALIDATION = 400
 }
