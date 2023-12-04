@@ -13,11 +13,11 @@ Content-Type: application/json
 
 {
   "title": "Sound of Freedoms",
-  "year": "2023",
+  "year": 2023,
   "director": "Alejandro Monteverde",
   "duration": 131,
   "poster": "https://upload.wikimedia.org/wikipedia/en/0/0f/The_Sound_of_Freedom_Poster.jpg",
-  "genres": ["Actions", "Dramas"]
+  "genres": ["Action", "Drama"]
 }
 
 ### Update movie
@@ -26,8 +26,8 @@ Content-Type: application/json
 
 {
   "title": "Sound of Freedom",
-  "year": 1194
+  "year": 2023
 }
 
 ### Delete movie
-DELETE http://localhost:3000/movies/8c308920-8ef9-11ee-b8cf-509a4c43f702
+DELETE http://localhost:3000/movies/1c4659ad-92f1-11ee-bf3a-509a4c43f702

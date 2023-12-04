@@ -3,12 +3,12 @@ export enum AssociationAlias {
   Movies = 'movies'
 }
 
-export enum SqlFunctions {
+export enum SqlFunction {
   LOWER = 'LOWER',
   UUID_TO_BIN = 'UUID_TO_BIN'
 }
 
-export enum ErrorMessages {
+export enum ErrorMessage {
   MOVIE_NOT_EXISTS = 'Movie does not exists',
   MOVIE_EXISTS = 'Movie already exists',
   INVALID_MOVIE_GENRE = 'Invalid genre name',
@@ -18,7 +18,7 @@ export enum ErrorMessages {
   DELETE_MOVIE_ERROR = 'Error deleting movie.'
 }
 
-export enum ErrorTypes {
+export enum ErrorType {
   NOT_FOUND = 404,
   AUTHORIZATION = 403,
   VALIDATION = 400

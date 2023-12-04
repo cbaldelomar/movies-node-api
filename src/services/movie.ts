@@ -5,7 +5,7 @@ import {
 } from '../types'
 import Genre from '../data/models/genre'
 import Movie from '../data/models/movie'
-import { AssociationAlias, ErrorMessages, ErrorTypes, SqlFunctions } from '../enums'
+import { AssociationAlias, ErrorMessage, ErrorType, SqlFunction } from '../enums'
 import { ResultError, ResultSuccess, ResultValidationError, ValidationError } from '../utils/result'
 import { validate as isUUID } from 'uuid'
 
@@ -83,12 +83,12 @@ export default class MovieService implements IMovieService {
 
   getById = async (id: string): Promise<Result<Movie>> => {
     if (!isUUID(id)) {
-      return ResultError.create(ErrorMessages.MOVIE_NOT_EXISTS, ErrorTypes.NOT_FOUND)
+      return ResultError.create(ErrorMessage.MOVIE_NOT_EXISTS, ErrorType.NOT_FOUND)
     }
 
     const movie = await Movie.findOne({
       where: {
-        id: this.database.fn(SqlFunctions.UUID_TO_BIN, id, true)
+        id: this.database.fn(SqlFunction.UUID_TO_BIN, id, true)
       },
       include: [AssociationAlias.Genres]
       // include: {
@@ -98,7 +98,7 @@ export default class MovieService implements IMovieService {
     })
 
     if (movie == null) {
-      return ResultError.create(ErrorMessages.MOVIE_NOT_EXISTS, ErrorTypes.NOT_FOUND)
+      return ResultError.create(ErrorMessage.MOVIE_NOT_EXISTS, ErrorType.NOT_FOUND)
     }
 
     return ResultSuccess.create(movie)
@@ -117,7 +117,7 @@ export default class MovieService implements IMovieService {
     })
 
     if (count > 0) {
-      const error = ValidationError.create('', ErrorMessages.MOVIE_EXISTS)
+      const error = ValidationError.create('', ErrorMessage.MOVIE_EXISTS)
       return ResultValidationError.create(error)
     }
 
@@ -194,7 +194,7 @@ export default class MovieService implements IMovieService {
     const errors: ValidationError[] = []
 
     invalidGenreNames.forEach(invalidGenre => {
-      const error = ValidationError.create('genres', ErrorMessages.INVALID_MOVIE_GENRE + ': ' + invalidGenre)
+      const error = ValidationError.create('genres', ErrorMessage.INVALID_MOVIE_GENRE + ': ' + invalidGenre)
       errors.push(error)
     })
 

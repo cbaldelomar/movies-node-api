@@ -1,4 +1,4 @@
-import { ErrorTypes } from '../enums'
+import { ErrorType } from '../enums'
 import {
   IResultError, IResultSuccess, IResultValidationError, IValidationError,
   ResultErrorType, ResultValidationErrorType
@@ -54,7 +54,7 @@ export class ResultValidationError implements IResultValidationError {
       errors2.push(errors)
     }
 
-    return new ResultValidationError(errors2, ErrorTypes.VALIDATION)
+    return new ResultValidationError(errors2, ErrorType.VALIDATION)
   }
 }
 

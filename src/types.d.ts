@@ -1,5 +1,5 @@
 import Movie from './data/models/movie'
-import { ErrorTypes } from './enums'
+import { ErrorType } from './enums'
 
 export interface IServer {
   host: string | undefined
@@ -65,9 +65,9 @@ export interface IUpdateMovieRequest {
   genres?: string[]
 }
 
-export type ResultErrorType = ErrorTypes.NOT_FOUND | ErrorTypes.AUTHORIZATION
+export type ResultErrorType = ErrorType.NOT_FOUND | ErrorType.AUTHORIZATION
 
-export type ResultValidationErrorType = ErrorTypes.VALIDATION
+export type ResultValidationErrorType = ErrorType.VALIDATION
 
 export interface IResultSuccess<T> {
   success: true
