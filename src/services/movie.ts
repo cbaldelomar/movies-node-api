@@ -1,7 +1,7 @@
 import { Op, QueryTypes, Sequelize } from 'sequelize'
 import {
   IMovieService, IMovieFilter, INewMovieId,
-  ICreateMovieRequest, IUpdateMovieRequest, ResultType
+  ICreateMovieRequest, IUpdateMovieRequest, Result
 } from '../types'
 import Genre from '../data/models/genre'
 import Movie from '../data/models/movie'
@@ -81,7 +81,7 @@ export default class MovieService implements IMovieService {
     // })
   }
 
-  getById = async (id: string): Promise<ResultType<Movie>> => {
+  getById = async (id: string): Promise<Result<Movie>> => {
     if (!isUUID(id)) {
       return ResultError.create(ErrorMessages.MOVIE_NOT_EXISTS, ErrorTypes.NOT_FOUND)
     }
@@ -104,7 +104,7 @@ export default class MovieService implements IMovieService {
     return ResultSuccess.create(movie)
   }
 
-  create = async (movie: ICreateMovieRequest): Promise<ResultType<Movie>> => {
+  create = async (movie: ICreateMovieRequest): Promise<Result<Movie>> => {
     const { title, year, director, duration, poster, rate, genres } = movie
 
     // Check if movie exists.
@@ -171,7 +171,7 @@ export default class MovieService implements IMovieService {
     }
   }
 
-  private static readonly checkValidGenres = async (genres: string[]): Promise<ResultType<Genre[]>> => {
+  private static readonly checkValidGenres = async (genres: string[]): Promise<Result<Genre[]>> => {
     // Check if genres exist.
     const uniqueGenres = [...new Set(genres)]
 
@@ -203,7 +203,7 @@ export default class MovieService implements IMovieService {
     return ResultValidationError.create(errors)
   }
 
-  update = async (id: string, movie: IUpdateMovieRequest): Promise<ResultType<Movie>> => {
+  update = async (id: string, movie: IUpdateMovieRequest): Promise<Result<Movie>> => {
     const { genres } = movie
     let movieGenres: Genre[] = []
 
@@ -250,7 +250,7 @@ export default class MovieService implements IMovieService {
     }
   }
 
-  delete = async (id: string): Promise<ResultType<Movie>> => {
+  delete = async (id: string): Promise<Result<Movie>> => {
     // Get movie from database.
     const result = await this.getById(id)
 

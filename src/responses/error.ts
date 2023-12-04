@@ -1,7 +1,7 @@
 import { ZodError } from 'zod'
 import { ErrorTypes } from '../enums'
 import {
-  IErrorResponse, IResultFailure,
+  IErrorResponse, ResultFailure,
   IValidationError, IValidationErrorResponse
 } from '../types'
 
@@ -21,7 +21,7 @@ export class ErrorResponse {
   private readonly getStatus = (): number => {
     if (this.isZodError()) return 400
 
-    return (this.error as IResultFailure).errorType
+    return (this.error as ResultFailure).errorType
   }
 
   private readonly getBody = (): IErrorResponse | IValidationErrorResponse => {
@@ -35,7 +35,7 @@ export class ErrorResponse {
         return { field, message: issue.message }
       })
     } else {
-      const error = this.error as IResultFailure
+      const error = this.error as ResultFailure
       if (error.errorType !== ErrorTypes.VALIDATION) {
         return { error: error.message }
       }
@@ -61,7 +61,7 @@ export class ErrorResponse {
   }
 }
 
-type ErrorType = IResultFailure | ZodError
+type ErrorType = ResultFailure | ZodError
 
 // export function errorResponse<T> (error: IResultFailure): IErrorResponse | IValidationErrorResponse<T> {
 //   if (error.errorType !== ErrorTypes.VALIDATION) {

@@ -39,10 +39,10 @@ export interface INewMovieId {
 
 export interface IMovieService {
   getAll: (filter: IMovieFilter) => Promise<Movie[]>
-  getById: (id: string) => Promise<ResultType<Movie>>
-  create: (movieDTO: ICreateMovieRequest) => Promise<ResultType<Movie>>
-  update: (id: string, movie: IUpdateMovieRequest) => Promise<ResultType<Movie>>
-  delete: (id: string) => Promise<ResultType<Movie>>
+  getById: (id: string) => Promise<Result<Movie>>
+  create: (movieDTO: ICreateMovieRequest) => Promise<Result<Movie>>
+  update: (id: string, movie: IUpdateMovieRequest) => Promise<Result<Movie>>
+  delete: (id: string) => Promise<Result<Movie>>
 }
 
 export interface ICreateMovieRequest {
@@ -90,9 +90,9 @@ export interface IValidationError {
   message: string
 }
 
-export type IResultFailure = IResultError | IResultValidationError
+export type ResultFailure = IResultError | IResultValidationError
 
-export type ResultType<T> = IResultSuccess<T> | IResultFailure
+export type Result<T> = IResultSuccess<T> | ResultFailure
 
 export interface IErrorResponse {
   error: string
