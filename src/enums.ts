@@ -21,5 +21,5 @@ export enum ErrorMessage {
 export enum ErrorType {
   NOT_FOUND = 404,
   AUTHORIZATION = 403,
-  VALIDATION = 400
+  VALIDATION = 422
 }

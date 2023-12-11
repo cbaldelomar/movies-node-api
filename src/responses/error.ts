@@ -19,7 +19,7 @@ export class ErrorResponse {
   private readonly isZodError = (): boolean => this.error instanceof ZodError
 
   private readonly getStatus = (): number => {
-    if (this.isZodError()) return 400
+    if (this.isZodError()) return ErrorType.VALIDATION
 
     return (this.error as ResultFailure).errorType
   }

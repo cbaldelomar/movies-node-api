@@ -18,7 +18,7 @@ export default class MovieController {
     if (!validationResult.success) {
       const errorResponse = new ErrorResponse(validationResult.error)
 
-      return res.status(errorResponse.status).json(errorResponse.body)
+      return res.status(400).json(errorResponse.body)
 
       // return res.status(400).json(validationResult.error.flatten())
     }
