@@ -57,7 +57,9 @@ export class ErrorResponse {
       }
     })
 
-    return { errors, fields }
+    if (Object.keys(fields).length > 0) return { errors, fields }
+
+    return { errors }
   }
 }
 

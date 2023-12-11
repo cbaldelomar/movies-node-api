@@ -100,7 +100,7 @@ export interface IErrorResponse {
 
 export interface IValidationErrorResponse<T = any> {
   errors: string[]
-  fields: {
+  fields?: {
     [K in keyof T]?: string[]
   }
 }
